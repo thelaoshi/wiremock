@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Thomas Akehurst
+ * Copyright (C) 2021-2022 Thomas Akehurst
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,10 @@ import com.github.tomakehurst.wiremock.common.Metadata;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.http.*;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,6 +47,7 @@ public class WebhookDefinition {
         toHttpHeaders(parameters.getMetadata("headers", null)),
         parameters.getString("body", null),
         parameters.getString("base64Body", null),
+        parameters.getString("bodyFileName", null),
         getDelayDistribution(parameters.getMetadata("delay", null)),
         parameters);
   }
@@ -86,11 +91,19 @@ public class WebhookDefinition {
       HttpHeaders headers,
       String body,
       String base64Body,
+      String bodyFileName,
       DelayDistribution delay,
       Parameters parameters) {
     this.method = method;
     this.url = url;
     this.headers = headers != null ? new ArrayList<>(headers.all()) : null;
+
+    // CUSTOM CODE START
+    // Override body when bodyFileName is present and body is absent
+    if (bodyFileName != null && body == null) {
+      body = loadBodyFileNameIntoString(bodyFileName);
+    }
+    // CUSTOM CODE END
 
     if (body != null) {
       this.body = new Body(body);
@@ -192,6 +205,13 @@ public class WebhookDefinition {
     return this;
   }
 
+  // CUSTOM CODE START
+  public WebhookDefinition withBodyFileName(String bodyFileName) {
+    this.body = new Body(loadBodyFileNameIntoString(bodyFileName));
+    return this;
+  }
+  // CUSTOM CODE END
+
   public WebhookDefinition withFixedDelay(int delayMilliseconds) {
     this.delay = new FixedDelayDistribution(delayMilliseconds);
     return this;
@@ -221,4 +241,17 @@ public class WebhookDefinition {
   public boolean hasBody() {
     return body != null && body.isPresent();
   }
+
+  // CUSTOM CODE START
+  private String loadBodyFileNameIntoString(final String bodyFileName) {
+    final Path path = Paths.get(System.getProperty("user.dir"), "__files/", bodyFileName);
+    try {
+      return Files.readString(path, StandardCharsets.UTF_8);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return "";
+  }
+  // CUSTOM CODE END
+
 }
