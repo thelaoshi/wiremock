@@ -98,12 +98,10 @@ public class WebhookDefinition {
     this.url = url;
     this.headers = headers != null ? new ArrayList<>(headers.all()) : null;
 
-    // CUSTOM CODE START
     // Override body when bodyFileName is present and body is absent
     if (bodyFileName != null && body == null) {
       body = loadBodyFileNameIntoString(bodyFileName);
     }
-    // CUSTOM CODE END
 
     if (body != null) {
       this.body = new Body(body);
@@ -205,12 +203,10 @@ public class WebhookDefinition {
     return this;
   }
 
-  // CUSTOM CODE START
   public WebhookDefinition withBodyFileName(String bodyFileName) {
     this.body = new Body(loadBodyFileNameIntoString(bodyFileName));
     return this;
   }
-  // CUSTOM CODE END
 
   public WebhookDefinition withFixedDelay(int delayMilliseconds) {
     this.delay = new FixedDelayDistribution(delayMilliseconds);
@@ -242,7 +238,6 @@ public class WebhookDefinition {
     return body != null && body.isPresent();
   }
 
-  // CUSTOM CODE START
   private String loadBodyFileNameIntoString(final String bodyFileName) {
     final Path path = Paths.get(System.getProperty("user.dir"), "__files/", bodyFileName);
     try {
@@ -252,6 +247,5 @@ public class WebhookDefinition {
     }
     return "";
   }
-  // CUSTOM CODE END
 
 }
