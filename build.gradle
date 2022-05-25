@@ -189,7 +189,7 @@ allprojects {
     mavenCentral()
   }
 
-  version = '2.33.2'
+  version = '2.33.2_oss'
 
   sourceCompatibility = 1.8
   targetCompatibility = 1.8
