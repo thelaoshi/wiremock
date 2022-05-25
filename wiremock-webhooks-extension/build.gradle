@@ -73,10 +73,10 @@ signing {
 publishing {
   repositories {
     maven {
-      url 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+      url = "https://maven.pkg.github.com/thelaoshi/wiremock"
       credentials {
-        username repoUser
-        password repoPassword
+        username = System.getenv("GITHUB_ACTOR")
+        password = System.getenv("GITHUB_TOKEN")
       }
     }
   }
