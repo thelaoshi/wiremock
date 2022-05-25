@@ -308,20 +308,12 @@ signing {
 
 publishing {
   repositories {
-    maven {
-      url 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
-      credentials {
-        username repoUser
-        password repoPassword
-      }
-    }
 
     maven {
-      name 'snapshots'
-      url 'https://oss.sonatype.org/content/repositories/snapshots'
+      url = "https://maven.pkg.github.com/thelaoshi/wiremock"
       credentials {
-        username repoUser
-        password repoPassword
+        username = System.getenv("GITHUB_ACTOR")
+        password = System.getenv("GITHUB_TOKEN")
       }
     }
   }
@@ -363,15 +355,15 @@ publishing {
 
 }
 
-task checkReleasePreconditions {
-  doLast {
-    def REQUIRED_GIT_BRANCH = 'master'
-    def currentGitBranch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
-    assert currentGitBranch == REQUIRED_GIT_BRANCH, "Must be on the $REQUIRED_GIT_BRANCH branch in order to release to Sonatype"
-    assert JavaVersion.current().isJava8(), 'Must use Java 8 when releasing'
-  }
-}
-publish.dependsOn checkReleasePreconditions
+// task checkReleasePreconditions {
+//   doLast {
+//     def REQUIRED_GIT_BRANCH = 'bodyFileName'
+//     def currentGitBranch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
+//     assert currentGitBranch == REQUIRED_GIT_BRANCH, "Must be on the $REQUIRED_GIT_BRANCH branch in order to release to Sonatype"
+//     assert JavaVersion.current().isJava8(), 'Must use Java 8 when releasing'
+//   }
+// }
+// publish.dependsOn checkReleasePreconditions
 
 assemble.dependsOn jar, shadowJar
 
